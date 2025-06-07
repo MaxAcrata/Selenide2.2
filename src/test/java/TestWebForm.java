@@ -27,7 +27,7 @@ public class TestWebForm {
     private static final String BASE_URL = "http://localhost:9999";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static List<String> validCities;
-    private static final int seconds= 10; // Время ожидание сервера
+    private static final int seconds= 10; // Время ожидания, в течение которого Selenide будет выполнять проверку.
     private static final int addedDays= 3; // количество дней добавленных к текущей дате
 
     @BeforeAll
