@@ -27,7 +27,8 @@ public class TestWebForm {
     private static final String BASE_URL = "http://localhost:9999";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static List<String> validCities;
-    private static final int seconds= 10;
+    private static final int seconds= 10; // Время ожидание сервера
+    private static final int addedDays= 3; // количество дней добавленных к текущей дате
 
     @BeforeAll
     static void setup() throws Exception {
@@ -88,7 +89,7 @@ public class TestWebForm {
 
         // 2. Дата
         if (!fieldToSkip.equals("date")) {
-            String validDate = LocalDate.now().plusDays(3).format(FORMATTER);
+            String validDate = LocalDate.now().plusDays(addedDays).format(FORMATTER);
             clearAndSetDate(validDate);
         }
 
@@ -112,12 +113,12 @@ public class TestWebForm {
         // 1. Тест с не валидным городом
     void invalidCity() {
         validValues("city");
-        $x("//input[@placeholder='Город']").setValue("Несуществоград");
+        $x("//input[@placeholder='Город']").setValue("Ура");
         $("button.button").click();
 
         $("[data-test-id='city'].input_invalid .input__sub")
                 .shouldBe(visible, Duration.ofSeconds(seconds))
-                .shouldHave(text("Доставка в выбранный город недоступна"), Duration.ofSeconds(5));
+                .shouldHave(text("Доставка в выбранный город недоступна"), Duration.ofSeconds(seconds));
     }
 
     @Test
@@ -180,7 +181,7 @@ public class TestWebForm {
         validValues("none");
 
         // Проверка вывода уведомления с датой
-        $x("//input[@placeholder='Дата встречи']").shouldHave(value(expectedDate), Duration.ofSeconds(5));
+        $x("//input[@placeholder='Дата встречи']").shouldHave(value(expectedDate), Duration.ofSeconds(seconds));
 
         // Нажатие кнопки
         $("button.button").click();
