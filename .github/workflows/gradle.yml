@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      #  Устанавливаем JDK 11 для работы с Java
+      # Устанавливаем JDK 11 для работы с Java
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
@@ -29,20 +29,53 @@ jobs:
       - name: Grant execute permission for Gradle wrapper
         run: chmod +x gradlew
 
-      # Запускаем локальный сервер в фоне 
-      - name: Start local server (background)
+      # Проверяем, что порт 9999 свободен
+      - name: Check port availability
         run: |
-          java -jar ./artifacts/app-card-delivery.jar   # '&' — запуск в фоне
-          sleep 10                                # ждём 10 секунд, чтобы сервер успел стартовать
+          if nc -z localhost 9999; then
+            echo "::error::Port 9999 is already in use"
+            exit 1
+          fi
 
-      # Запускаем автотесты (предполагается, что они подключены к локальному серверу)
+      # Запускаем локальный сервер с проверкой готовности
+      - name: Start local server with health check
+        run: |
+          # Запуск сервера в фоне с записью логов и PID
+          java -jar ./artifacts/app-card-delivery.jar > server.log 2>&1 &
+          echo $! > server.pid
+          
+          # Ожидание готовности сервера (максимум 30 секунд)
+          echo "Waiting for server to start..."
+          timeout 30 bash -c 'until nc -z localhost 9999; do sleep 1; done'
+          echo "Server is ready on port 9999"
+
+      # Запускаем автотесты
       - name: Run tests
         run: ./gradlew test
 
-      # Если тесты упали — загружаем отчет о тестах как артефакт
+      # Выводим логи сервера если тесты упали
+      - name: Display server logs if tests fail
+        if: failure()
+        run: |
+          echo "=== Server logs ==="
+          cat server.log
+          echo "==================="
+
+      # Останавливаем сервер в любом случае
+      - name: Stop local server
+        if: always()
+        run: |
+          if [ -f server.pid ]; then
+            echo "Stopping server..."
+            kill $(cat server.pid) || true
+            rm server.pid
+            echo "Server stopped"
+          fi
+
+      # Загружаем отчет о тестах если они упали
       - name: Upload test report if tests fail
-        if: failure()                             # Выполняется только если предыдущий шаг не удался
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: test-report                      # Имя артефакта
-          path: build/reports/tests/test         # Путь к отчету об ошибках
+          name: test-report
+          path: build/reports/tests/test
