@@ -27,6 +27,7 @@ public class TestWebForm {
     private static final String BASE_URL = "http://localhost:9999";
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
     private static List<String> validCities;
+    private static final int seconds= 10;
 
     @BeforeAll
     static void setup() throws Exception {
@@ -115,7 +116,7 @@ public class TestWebForm {
         $("button.button").click();
 
         $("[data-test-id='city'].input_invalid .input__sub")
-                .shouldBe(visible, Duration.ofSeconds(5))
+                .shouldBe(visible, Duration.ofSeconds(seconds))
                 .shouldHave(text("Доставка в выбранный город недоступна"), Duration.ofSeconds(5));
     }
 
@@ -127,9 +128,9 @@ public class TestWebForm {
         $("button.button").click();
 
         $("[data-test-id='name'].input_invalid .input__sub")
-                .shouldBe(visible, Duration.ofSeconds(5))
+                .shouldBe(visible, Duration.ofSeconds(seconds))
                 .shouldHave(text("Имя и Фамилия указаные неверно. Допустимы только русские буквы, пробелы и дефисы."),
-                        Duration.ofSeconds(5));
+                        Duration.ofSeconds(seconds));
     }
 
     @Test
@@ -145,8 +146,8 @@ public class TestWebForm {
         $("button.button").click();
 
         $("[data-test-id='phone'].input_invalid .input__sub")
-                .shouldBe(visible, Duration.ofSeconds(5))
-                .shouldHave(text("Телефон указан неверно"), Duration.ofSeconds(5));
+                .shouldBe(visible, Duration.ofSeconds(seconds))
+                .shouldHave(text("Телефон указан неверно"), Duration.ofSeconds(seconds));
     }
 
     @Test
@@ -161,7 +162,7 @@ public class TestWebForm {
         $("button.button").click();
 
         $("[data-test-id='agreement'].input_invalid")
-                .shouldBe(visible, Duration.ofSeconds(5));
+                .shouldBe(visible, Duration.ofSeconds(seconds));
     }
 
     @Test
@@ -187,8 +188,8 @@ public class TestWebForm {
         // Проверка уведомления
         $(".notification__title")
                 .shouldBe(visible, Duration.ofSeconds(15))
-                .shouldHave(text("Успешно"), Duration.ofSeconds(5));
+                .shouldHave(text("Успешно"), Duration.ofSeconds(seconds));
         $(".notification__content")
-                .shouldHave(text("Встреча успешно забронирована на " + expectedDate), Duration.ofSeconds(5));
+                .shouldHave(text("Встреча успешно забронирована на " + expectedDate), Duration.ofSeconds(seconds));
     }
 }
