@@ -32,7 +32,6 @@ public class TestWebForm {
 
     @BeforeAll
     static void setup() throws Exception {
-        Configuration.headless = true; //  false, для того чтобы видеть браузер
         Configuration.browserSize = "1920x1080";
 
         /**
