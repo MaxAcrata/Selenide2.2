@@ -82,8 +82,6 @@ public class TestWebForm {
             SelenideElement cityInput = $x("//input[@placeholder='Город']");
             cityInput.setValue(city);
 
-            // Выбор нужного города из выпадающего списка
-            $$(".menu-item").findBy(text(city)).click();
         }
 
         // 2. Дата
